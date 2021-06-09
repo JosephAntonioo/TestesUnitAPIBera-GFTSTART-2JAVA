@@ -4,6 +4,7 @@ import digital.innovation.one.TestesUnitAPIBera.builder.BeerDTOBuilder;
 import digital.innovation.one.TestesUnitAPIBera.dto.BeerDTO;
 import digital.innovation.one.TestesUnitAPIBera.entity.BeerModel;
 import digital.innovation.one.TestesUnitAPIBera.exception.BeerAlreadyRegisteredException;
+import digital.innovation.one.TestesUnitAPIBera.exception.BeerNotFoundException;
 import digital.innovation.one.TestesUnitAPIBera.mapper.BeerMapper;
 import digital.innovation.one.TestesUnitAPIBera.repository.BeerRepository;
 import org.junit.jupiter.api.Test;
@@ -62,4 +63,20 @@ public class BeerServiceTest {
         //then
         assertThrows(BeerAlreadyRegisteredException.class, () -> beerService.createBeer(expectedBeerDTO));
     }
+
+    @Test
+    void whenValidBeerNameIsGivenThenReturnABeer() throws BeerNotFoundException {
+        // given
+        BeerDTO expectedFoundBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
+        BeerModel expectedFoundBeer = beerMapper.toModel(expectedFoundBeerDTO);
+
+        // when
+        when(beerRepository.findByName(expectedFoundBeer.getName())).thenReturn(Optional.of(expectedFoundBeer));
+
+        // then
+        BeerDTO foundBeerDTO = beerService.findByName(expectedFoundBeerDTO.getName());
+
+        assertThat(foundBeerDTO, is(equalTo(expectedFoundBeerDTO)));
+    }
+
 }
